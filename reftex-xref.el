@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2024  Karthik Chikmagalur
 
-;; Author: Karthik Chikmagalur(require 'xref) <karthikchikmagalur@gmail.com>
+;; Author: Karthik Chikmagalur <karthikchikmagalur@gmail.com>
 ;; Keywords: tex, convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@
 ;; `reftex-xref-activate' in a major-mode hook to enable them.
 
 ;;; Code:
+(require 'xref)
 (require 'reftex-ref)
 
 (cl-defmethod xref-backend-identifier-at-point ((_backend (eql reftex)))
