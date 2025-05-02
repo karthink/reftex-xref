@@ -44,10 +44,12 @@
               (re (format reftex-find-label-regexp-format (regexp-quote label)))
               (found (with-current-buffer buffer
                        (or (re-search-backward re nil t)
-                           (progn (goto-char (point-min))
-                                  (re-search-forward
-                                   (format reftex-find-label-regexp-format2
-                                           (regexp-quote label))
+                           (re-search-forward re nil t)
+                           (save-excursion
+                             (goto-char (point-min))
+                             (re-search-forward
+                              (format reftex-find-label-regexp-format2
+                                      (regexp-quote label))
                                    nil t))))))
     (list (xref-make prompt (xref-make-buffer-location
                              buffer found)))))
