@@ -3,7 +3,10 @@
 ;; Copyright (C) 2024  Karthik Chikmagalur
 
 ;; Author: Karthik Chikmagalur <karthikchikmagalur@gmail.com>
+;; Maintainer: Karthik Chikmagalur <karthikchikmagalur@gmail.com>
+;; Version: 0.1.0
 ;; Keywords: tex, convenience
+;; Homepage: https://github.com/karthink/reftex-xref
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,6 +29,11 @@
 ;;; Code:
 (require 'xref)
 (require 'reftex-ref)
+; to use these function safely
+(require 'auctex)
+(declare-function LaTeX-outline-regexp "latex")
+(declare-function LaTeX-find-matching-end "latex")
+(declare-function LaTeX-find-matching-begin "latex")
 
 (cl-defmethod xref-backend-identifier-at-point ((_backend (eql reftex)))
   (when (looking-back "\\\\\\(?:page\\|eq\\|auto\\|c\\)?ref{[-a-zA-Z0-9_*.:]*"
@@ -61,14 +69,12 @@
   "Function to activate buffer-local backend.
 Add this function to `xref-backend-functions' to use xref to find
 function and variable definitions in the same buffer.
-
 This should have a low priority among xref backends."
   'reftex)
 
 ;; Eldoc support via xref, because why not
 (defun reftex-xref--display-in-eldoc (callback)
   "Display reference label location in Eldoc.
-
 Call CALLBACK if possible."
   (when (cl-intersection
          (ensure-list (get-char-property (point) 'face))
@@ -77,7 +83,7 @@ Call CALLBACK if possible."
     (save-excursion
       (when-let*
           ((inhibit-redisplay t)
-           (_macro (car (reftex-what-macro-safe 1)))
+           ((car (reftex-what-macro-safe 1)))
            (key (reftex-this-word "^{}%\n\r, \t"))
            (item (car (xref-backend-definitions 'reftex key)))
            (location (xref-item-location item))
@@ -114,7 +120,7 @@ Call CALLBACK if possible."
                     (pcase major-mode
                       ('org-mode 'org-overlay-type)
                       ('latex-mode 'category))))
-                  (_ (memq (car prop-and-ov)
+                  ((memq (car prop-and-ov)
                            '(org-latex-overlay preview-overlay)))
                   (ov (cdr prop-and-ov)))
             (funcall callback (propertize docstring 'display
