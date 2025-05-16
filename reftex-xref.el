@@ -1,32 +1,36 @@
-;;; reftex-xref.el --- xref and eldoc support for reftex  -*- lexical-binding: t; -*-
-
+;;; reftex-xref.el --- Xref and eldoc support for reftex  -*- lexical-binding: t; -*-
+;;
 ;; Copyright (C) 2024  Karthik Chikmagalur
-
+;;
 ;; Author: Karthik Chikmagalur <karthikchikmagalur@gmail.com>
 ;; Maintainer: Karthik Chikmagalur <karthikchikmagalur@gmail.com>
-;; Version: 0.1.0
+;; Version: 0.2.0
 ;; Keywords: tex, convenience
 ;; Homepage: https://github.com/karthink/reftex-xref
-
+;; Package-Requires: ((emacs "28.1"))
+;;
+;; This file is not part of GNU Emacs.
+;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
-
+;;
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
-
+;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+;;
 ;;; Commentary:
-
+;;
 ;; xref and eldoc support for RefTeX.  Use `reftex-eldoc-activate'and
 ;; `reftex-xref-activate' in a major-mode hook to enable them.
-
+;;
 ;;; Code:
+
 (require 'xref)
 (require 'reftex-ref)
 ; to use these function safely
@@ -36,12 +40,15 @@
 (declare-function LaTeX-find-matching-begin "latex")
 
 (cl-defmethod xref-backend-identifier-at-point ((_backend (eql reftex)))
+  "Xref backend identifier for RefTeX."
   (when (looking-back "\\\\\\(?:page\\|eq\\|auto\\|c\\)?ref{[-a-zA-Z0-9_*.:]*"
                                       (line-beginning-position))
 		    (reftex-this-word "-a-zA-Z0-9_*.:")))
 
 (cl-defmethod xref-backend-definitions ((_backend (eql reftex)) prompt)
-  (unless (symbol-value reftex-docstruct-symbol) (reftex-parse-one))
+  "Xref backend definitions for RefTeX.
+PROMPT is the summary given to `xref-make'."
+  (unless (symbol-value reftex-docstruct-symbol) (reftex-parse-all))
   (when-let* ((docstruct (symbol-value reftex-docstruct-symbol))
               (data (assoc prompt docstruct))
               (label (nth 0 data))
@@ -63,6 +70,8 @@
                              buffer found)))))
 
 (cl-defmethod xref-backend-apropos ((_backend (eql reftex)) pattern)
+  "Xref backend apropos for RefTeX.
+The argument PATTERN has the same meaning as in `apropos'."
   (xref-backend-definitions 'reftex pattern))
 
 (defun reftex-xref ()
@@ -127,13 +136,14 @@ Call CALLBACK if possible."
                                           (overlay-get ov 'preview-image)))
           (funcall callback docstring))))))
 
-(defun reftex-eldoc-activate ()
+(defun reftex-xref-eldoc-activate ()
+  "Activate RefTeX support for eldoc."
   (add-hook 'eldoc-documentation-functions
             'reftex-xref--display-in-eldoc
             nil :local))
 
 (defun reftex-xref-activate ()
-  "Activate reftex support using xref."
+  "Activate RefTeX support for xref."
   (add-hook 'xref-backend-functions
             'reftex-xref nil :local))
 
