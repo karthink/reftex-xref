@@ -77,7 +77,7 @@ This should have a low priority among xref backends."
   "Display reference label location in Eldoc.
 Call CALLBACK if possible."
   (when (cl-intersection
-         (ensure-list (get-char-property (point) 'face))
+         (ensure-list (get-text-property (point) 'face))
          '(font-lock-keyword-face font-lock-constant-face
            TeX-fold-unfolded-face))
     (save-excursion
